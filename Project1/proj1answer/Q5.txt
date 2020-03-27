@@ -1,0 +1,30 @@
+SELECT
+	count( DISTINCT a.id ) 
+FROM
+	students a
+	JOIN program_enrolments d ON a.id = d.student,
+	streams b
+	JOIN stream_enrolments c ON b.id = c.stream,
+	semesters e 
+WHERE
+	e.id = d.semester 
+	AND c.partOf = d.id 
+	AND a.stype = 'local' 
+	AND b.NAME = 'Chemistry' 
+	AND e.NAME = 'Sem1 2011';
+SELECT
+	count( DISTINCT a.id ) 
+FROM
+	students a,
+	programs b,
+	orgunits c,
+	program_enrolments d,
+	semesters e 
+WHERE
+	e.id = d.semester 
+	AND a.id = d.student 
+	AND d.program = b.id 
+	AND b.offeredBy = c.id 
+	AND e.NAME = 'Sem1 2011' 
+	AND c.longname = 'School of Computer Science and Engineering' 
+	AND a.stype = 'intl';

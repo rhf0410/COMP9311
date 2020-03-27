@@ -1,0 +1,44 @@
+SELECT
+	b.CODE AS CODE,
+	b.NAME AS NAME,
+	d.NAME AS semester 
+FROM
+	subjects b,
+	courses c,
+	semesters d,
+	(
+SELECT
+	a.course AS course,
+	AVG( a.mark ) AS avgmark 
+FROM
+	course_enrolments a 
+WHERE
+	a.mark IS NOT NULL 
+GROUP BY
+	a.course 
+HAVING
+	count( a.course ) >= 15 
+	) t2,
+	(
+SELECT
+	max( t.avgmark ) AS max_avg 
+FROM
+	(
+SELECT
+	a.course AS course,
+	AVG( a.mark ) AS avgmark 
+FROM
+	course_enrolments a 
+WHERE
+	a.mark IS NOT NULL 
+GROUP BY
+	a.course 
+HAVING
+	count( a.course ) >= 15 
+	) t 
+	) t3 
+WHERE
+	c.id = t2.course 
+	AND t2.avgmark = t3.max_avg 
+	AND c.SUBJECT = b.id 
+	AND c.semester = d.id

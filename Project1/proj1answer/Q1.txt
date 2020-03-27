@@ -1,0 +1,24 @@
+CREATE VIEW Q1 AS (
+SELECT
+	b.unswid AS unswid,
+	b.`name` AS NAME 
+FROM
+	students a,
+	people b,
+	(
+SELECT
+	c.student AS student 
+FROM
+	course_enrolments c 
+WHERE
+	c.mark >= 85 
+GROUP BY
+	c.student 
+HAVING
+	count( c.student ) > 20 
+	) t 
+WHERE
+	a.id = b.id 
+	AND b.id = t.student 
+	AND a.stype = 'intl' 
+	)

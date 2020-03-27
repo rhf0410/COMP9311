@@ -1,0 +1,26 @@
+SELECT
+	a.unswid AS unswid,
+	a.NAME AS NAME 
+FROM
+	people a,
+	course_enrolments b,
+	courses c,
+	subjects d 
+WHERE
+	a.id = b.student 
+	AND b.course = c.id 
+	AND c.SUBJECT = d.id 
+	AND d.CODE = 'COMP3331' Except
+SELECT
+	a.unswid AS unswid,
+	a.NAME AS NAME 
+FROM
+	people a,
+	course_enrolments b,
+	courses c,
+	subjects d 
+WHERE
+	a.id = b.student 
+	AND b.course = c.id 
+	AND c.SUBJECT = d.id 
+	AND d.CODE = 'COMP3231'

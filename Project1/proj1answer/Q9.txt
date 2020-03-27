@@ -1,0 +1,38 @@
+SELECT
+	a1.NAME AS NAME,
+	b1.longname AS school,
+	a1.email AS email,
+	c1.STARTING AS STARTING,
+	t.num_subjects AS num_subjects 
+FROM
+	people a1,
+	orgunits b1
+	JOIN affiliations c1 ON c1.orgunit = b1.id,
+	OrgUnit_types d1,
+	(
+SELECT
+	a.staff AS staff,
+	count( DISTINCT e.CODE ) AS num_subjects 
+FROM
+	Affiliations a
+	JOIN staff_roles b ON b.id = a.role,
+	course_staff c
+	JOIN courses d ON c.course = d.id,
+	subjects e 
+WHERE
+	a.staff = c.staff 
+	AND e.id = d.SUBJECT 
+	AND b.NAME = 'Head of School' 
+	AND a.ending IS NULL 
+	AND a.isPrimary = 't' 
+GROUP BY
+	a.staff 
+	) t 
+WHERE
+	a1.id = t.staff 
+	AND c1.staff = a1.id 
+	AND d1.id = b1.utype 
+	AND c1.staff = t.staff 
+	AND c1.isPrimary = 't' 
+	AND c1.ending IS NULL 
+	AND d1.NAME = 'School'

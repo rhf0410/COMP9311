@@ -1,0 +1,18 @@
+CREATE VIEW Q2 AS (
+SELECT
+	a.unswid AS unswid,
+	a.longname AS NAME 
+FROM
+	rooms a,
+	buildings b,
+	room_types c 
+WHERE
+	b.NAME = 'Computer Science building' 
+	AND a.building = b.id 
+	AND c.id = a.rtype 
+	AND c.description = 'Meeting Room' 
+	AND a.capacity >= 20 
+	)
+
+
+	

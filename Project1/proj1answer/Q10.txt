@@ -1,0 +1,119 @@
+CREATE 
+	OR REPLACE VIEW total_num AS (
+SELECT
+	total.CODE AS CODE,
+	total.NAME AS NAME,
+	total.YEAR AS YEAR,
+	total.S1_HD_rate AS S1_HD_rate,
+	total.S2_HD_rate AS S2_HD_rate 
+FROM
+	(
+SELECT
+	c11.CODE AS CODE,
+	c11.NAME AS NAME,
+	ts1.YEAR AS YEAR,
+	ts1.S1_HD_rate AS S1_HD_rate,
+	ts2.S2_HD_rate AS S2_HD_rate 
+FROM
+	subjects c11,
+	(
+SELECT
+	t.CODE AS CODE,
+	t.semester AS semester,
+	t.YEAR AS YEAR,
+	CAST(
+	( CASE WHEN t.num_of_Courses = 0.00 THEN 0 ELSE t.num_of_HD / t.num_of_Courses END ) AS NUMERIC ( 4, 2 ) 
+	) AS S1_HD_rate 
+FROM
+	(
+SELECT
+	c.CODE AS CODE,
+	b.semester AS semester,
+	RIGHT ( cast( d.YEAR AS VARCHAR ), 2 ) AS YEAR,
+	d.term AS term,
+	cast(
+	sum( CASE WHEN a.mark >= 85 AND a.grade = 'HD' THEN 1 ELSE 0 END ) AS NUMERIC ( 4, 2 ) 
+	) AS num_of_HD,
+	cast( sum( CASE WHEN a.mark >= 0 THEN 1 ELSE 0 END ) AS NUMERIC ( 4, 2 ) ) AS num_of_Courses 
+FROM
+	course_enrolments a
+	JOIN courses b ON a.course = b.id,
+	subjects c,
+	semesters d 
+WHERE
+	b.SUBJECT = c.id 
+	AND b.semester = d.id 
+	AND d.YEAR >= 2003 
+	AND d.YEAR <= 2012 
+	AND a.mark IS NOT NULL 
+	AND c.CODE LIKE 'COMP93%' 
+GROUP BY
+	c.CODE,
+	b.semester,
+	d.term,
+	d.YEAR 
+	) t 
+WHERE
+	t.term = 'S1' 
+	) ts1
+	JOIN (
+SELECT
+	t.CODE AS CODE,
+	t.semester AS semester,
+	t.YEAR AS YEAR,
+	CAST(
+	( CASE WHEN t.num_of_Courses = 0.00 THEN 0 ELSE t.num_of_HD / t.num_of_Courses END ) AS NUMERIC ( 4, 2 ) 
+	) AS S2_HD_rate 
+FROM
+	(
+SELECT
+	c.CODE AS CODE,
+	b.semester AS semester,
+	RIGHT ( cast( d.YEAR AS VARCHAR ), 2 ) AS YEAR,
+	d.term AS term,
+	cast(
+	sum( CASE WHEN a.mark >= 85 AND a.grade = 'HD' THEN 1 ELSE 0 END ) AS NUMERIC ( 4, 2 ) 
+	) AS num_of_HD,
+	cast( sum( CASE WHEN a.mark >= 0 THEN 1 ELSE 0 END ) AS NUMERIC ( 4, 2 ) ) AS num_of_Courses 
+FROM
+	course_enrolments a
+	JOIN courses b ON a.course = b.id,
+	subjects c,
+	semesters d 
+WHERE
+	b.SUBJECT = c.id 
+	AND b.semester = d.id 
+	AND d.YEAR >= 2003 
+	AND d.YEAR <= 2012 
+	AND a.mark IS NOT NULL 
+	AND c.CODE LIKE 'COMP93%' 
+GROUP BY
+	c.CODE,
+	b.semester,
+	d.term,
+	d.YEAR 
+	) t 
+WHERE
+	t.term = 'S2' 
+	) ts2 ON ts1.CODE = ts2.CODE 
+	AND ts1.YEAR = ts2.YEAR 
+WHERE
+	ts1.CODE = c11.CODE 
+	) total 
+	);
+SELECT
+	a.CODE AS CODE,
+	a.NAME AS NAME,
+	a.YEAR AS YEAR,
+	a.S1_HD_rate AS S1_HD_rate,
+	a.S2_HD_rate AS S2_HD_rate 
+FROM
+	total_num a,
+	( SELECT b.CODE AS CODE, count( DISTINCT b.YEAR ) AS num FROM total_num b GROUP BY b.CODE ) t 
+WHERE
+	t.CODE = a.CODE 
+	AND t.num = 10 
+ORDER BY
+	a.CODE,
+	a.NAME,
+	a.YEAR ASC

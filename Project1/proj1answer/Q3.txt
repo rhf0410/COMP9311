@@ -1,0 +1,22 @@
+CREATE VIEW Q3 AS (
+SELECT
+	c.unswid AS unswid,
+	c.`name` AS NAME 
+FROM
+	course_enrolments a
+	JOIN course_staff b ON a.course = b.course,
+	people c,
+	(
+SELECT
+	e.id AS id 
+FROM
+	people e,
+	students f 
+WHERE
+	e.id = f.id 
+	AND e.NAME = 'Stefan Bilek' 
+	) t 
+WHERE
+	t.id = a.student 
+	AND c.id = b.staff 
+	)

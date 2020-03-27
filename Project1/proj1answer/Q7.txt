@@ -1,0 +1,19 @@
+SELECT
+	a.CODE AS CODE,
+	a.NAME AS NAME 
+FROM
+	programs a,
+	(
+SELECT
+	b.program AS program,
+	sum( CASE WHEN c.stype = 'intl' OR c.stype = 'local' THEN 1 ELSE 0 END ) AS total_num,
+	sum( CASE WHEN c.stype = 'intl' THEN 1 ELSE 0 END ) AS international_num 
+FROM
+	program_enrolments b
+	INNER JOIN students c ON b.student = c.id 
+GROUP BY
+	b.program 
+	) e 
+WHERE
+	a.id = e.program 
+	AND 2 * e.international_num > e.total_num

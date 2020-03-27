@@ -1,0 +1,8 @@
+create or replace function Q6(text) returns text
+as
+$$
+SELECT a.code||' '||a.name||' '||a.uoc
+FROM
+subjects a
+where a.code = $1;
+$$ language sql;
